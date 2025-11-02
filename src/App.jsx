@@ -30,7 +30,7 @@ export default function App() {
   }
 
   async function fetchNewWord() {
-      localStorage.clear() // Uncomment to clear local storage and fetch new set of 1000 words
+      // localStorage.clear() // Uncomment to clear local storage and fetch new set of 1000 words
       let corpus = JSON.parse(localStorage.getItem("corpus"))
       if (corpus === null) {
         const response = await axios.get('https://api.datamuse.com/words?sp=?????&max=1000')
