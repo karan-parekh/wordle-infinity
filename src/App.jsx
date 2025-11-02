@@ -2,6 +2,7 @@ import { useState } from 'react'
 import './App.css'
 import { useEffect } from 'react'
 import axios from 'axios'
+import { useWordChecker } from 'react-word-checker'
 
 const WORD_LENGTH = 5
 const TOTAL_GUESSES = 6
@@ -14,8 +15,9 @@ function App() {
   const [letterCount, setLetterCount] = useState(0)
   const [currentWord, setCurrentWord] = useState("     ")
   const [gameOver, setGameOver] = useState(null)
+  const { _, isLoading, wordExists } = useWordChecker("en")
 
-  function printGameState() {
+  function printGameState() { // For debugging purpose only
     console.log(`==== GAME STATE START ====`)
     console.log(`guessedWords: ${guessedWords}`)
     console.log(`correctWord: ${correctWord}`)
@@ -53,6 +55,13 @@ function App() {
 
   function handleEnter() {
 
+    if (letterCount !== WORD_LENGTH) return
+
+    if (!isValidEnglishWord(currentWord)) {
+      alert("Enter a valid English word")
+      return
+    }
+
     if (currentWord === correctWord) {
       setGameOver('WON')
       alert("YOU WON! :) Refresh the page for a new word")
@@ -61,12 +70,7 @@ function App() {
 
     if (currentWord !== correctWord && wordCount === TOTAL_GUESSES - 1) {
       setGameOver('LOST')
-      alert(`YOU LOST! :( The correct word was "${correctWord.toUpperCase()}" \n Refresh the page for a new word`)
-      return
-    }
-
-    if (letterCount !== WORD_LENGTH) {
-      console.log("Words must be 5 letters to check")
+      alert(`YOU LOST! :( The correct word was "${correctWord.toUpperCase()}" \n Reset the game for a new word`)
       return
     }
 
@@ -79,7 +83,6 @@ function App() {
     setWordCount(wordCount => wordCount + 1)
     setLetterCount(0)
     setCurrentWord("     ")
-
   }
   
   function handleBackSpace() {
@@ -111,6 +114,13 @@ function App() {
 
     setLetterCount(letterCount => letterCount + 1)
 
+  }
+
+  function isValidEnglishWord(word) {
+    if (!isLoading) {
+      return wordExists(word)
+    }
+    throw new Error("Failed to check validity of the word")
   }
 
   // This is the main useEffect that handles the game loop
