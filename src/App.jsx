@@ -7,7 +7,7 @@ import { useWordChecker } from 'react-word-checker'
 const WORD_LENGTH = 5
 const TOTAL_GUESSES = 6
 
-function App() {
+export default function App() {
   const [guessedWords, setGuessedWords] = useState(new Array(TOTAL_GUESSES).fill("     "))
   const [correctWord, setCorrectWord]   = useState("")
   const [letterFrequency, setLetterFrequency] = useState({})
@@ -64,7 +64,7 @@ function App() {
 
     if (currentWord === correctWord) {
       setGameOver('WON')
-      alert("YOU WON! :) Refresh the page for a new word")
+      alert("YOU WON! :) RESET the game for a new word")
       return
     }
 
@@ -157,8 +157,8 @@ function App() {
   }
 
   return (
-    <>
-      <span className='text-5xl text-white font-extrabold'>WORDLE!</span>
+    <div className='flex flex-col items-center'>
+      <span className='text-5xl text-white font-extrabold mb-2'>WORDLE<br/>INFINITY!</span>
       {guessedWords.map((word, index) => {
         if (index === wordCount) {
           return (
@@ -181,20 +181,18 @@ function App() {
           />
         )
       })}
-      <button
+      <button className='mt-2'
         onClick={(e) => {resetGame(); e.target.blur()}}
       >RESET GAME</button>
-    </>
+    </div>
   )
 }
-
-export default App
 
 
 function WordLine( {word, correctWord, letterFrequency, revealed} ) {
 
   return (
-    <div className='flex flex-row space-x-1 m-2'>
+    <div className='flex flex-row space-x-1 m-1'>
       {word.split("").map((letter, index) => {   
 
         const isInCorrectWord = letter in letterFrequency
