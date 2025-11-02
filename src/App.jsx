@@ -57,16 +57,21 @@ export default function App() {
 
     if (letterCount !== WORD_LENGTH) return
 
-    if (!isValidEnglishWord(currentWord)) {
-      alert("Enter a valid English word")
-      return
-    }
-
+    // ===== WARNING =====
+    // The order of the below two functions is important, otherwise it results in the correct word being marked as an invalid English word
+    // This happens because the corpus of words is pulled from https://www.datamuse.com/api/ while the validity of the word is checked by react-word-checker package
+    // Ideally this should be done by the same source. 
     if (currentWord === correctWord) {
       setGameOver('WON')
       alert("YOU WON! :) RESET the game for a new word")
       return
     }
+
+    if (!isValidEnglishWord(currentWord)) {
+      alert("Enter a valid English word")
+      return
+    }
+    // ====== WARNING END ======
 
     if (currentWord !== correctWord && wordCount === TOTAL_GUESSES - 1) {
       setGameOver('LOST')
