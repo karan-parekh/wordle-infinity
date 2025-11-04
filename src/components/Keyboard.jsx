@@ -12,8 +12,8 @@ export default function Keyboard() {
 
   function handleClick(letter) {
     const event = new KeyboardEvent('keydown', {
-      key: letter,
-      code: `Key${letter}`,
+      key: letter === '⌫'? 'Backspace' :letter,
+      code: letter === '⌫' ? 'KeyBackspace' : `Key${letter}`,
       bubbles: true,
       cancelable: true,
     })
