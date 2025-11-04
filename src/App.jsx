@@ -4,6 +4,7 @@ import { useEffect } from 'react'
 import axios from 'axios'
 import { useWordChecker } from 'react-word-checker'
 import WordLine from './components/WordLine'
+import Keyboard from './components/Keyboard'
 
 const WORD_LENGTH = 5 // Change length of words to guess
 const TOTAL_GUESSES = 6 // Change the number of guesses
@@ -188,6 +189,9 @@ export default function App() {
           />
         )
       })}
+      <div>
+        <Keyboard/>
+      </div>
       <button className='mt-2'
         onClick={(e) => {resetGame(); e.target.blur()}}
       >RESET GAME</button>
