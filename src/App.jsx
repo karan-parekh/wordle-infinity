@@ -189,12 +189,8 @@ export default function App() {
           />
         )
       })}
-      <div>
-        <Keyboard/>
-      </div>
-      <button className='mt-2'
-        onClick={(e) => {resetGame(); e.target.blur()}}
-      >RESET GAME</button>
+      {gameOver == null && <Keyboard/>}
+      {gameOver && <button className='mt-2' onClick={(e) => {resetGame(); e.target.blur()}}>RESET GAME</button>}
     </div>
   )
 }
