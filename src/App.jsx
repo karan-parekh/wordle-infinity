@@ -3,18 +3,20 @@ import './App.css'
 import { useEffect } from 'react'
 import axios from 'axios'
 import { useWordChecker } from 'react-word-checker'
-import WordLine from './components/WordLine'
+import WordLine, { GREEN, YELLOW } from './components/WordLine'
 import Keyboard from './components/Keyboard'
 
+// NOTE: Make sure to refresh the corpus if the numbers are changed (original values are 5 and 6 respectively)
 const WORD_LENGTH = 5 // Change length of words to guess
-const TOTAL_GUESSES = 6 // Change the number of guesses
-// NOTE: Make sure to refresh the corpus if the above numbers are changed (original values are 5 and 6 respectively)
+const MAX_ATTEMPTS = 6 // Change the number of guesses
+const ALPHABET = 'qwertyuiopasdfghjklzxcvbnm'
 
 export default function App() {
-  const [guessedWords, setGuessedWords] = useState(new Array(TOTAL_GUESSES).fill("     "))
+  const [guessedWords, setGuessedWords] = useState(new Array(MAX_ATTEMPTS).fill("     "))
   const [correctWord, setCorrectWord]   = useState("")
   const [letterFrequency, setLetterFrequency] = useState({})
-  const [wordCount, setWordCount] = useState(0)
+  const [alphabetColor, setAlphabetColors] = useState(() => generateAlphabetColor())
+  const [attempts, setAttempts] = useState(0)
   const [letterCount, setLetterCount] = useState(0)
   const [currentWord, setCurrentWord] = useState("     ")
   const [gameOver, setGameOver] = useState(null)
@@ -25,7 +27,7 @@ export default function App() {
     console.log(`guessedWords: ${guessedWords}`)
     console.log(`correctWord: ${correctWord}`)
     console.log(`letterFrequency: ${JSON.stringify(letterFrequency)}`)
-    console.log(`wordCount: ${wordCount}`)
+    console.log(`attempts: ${attempts}`)
     console.log(`letterCount: ${letterCount}`)
     console.log(`currentWord: ${currentWord}`)
     console.log(`gameOver: ${gameOver}`)
@@ -36,7 +38,7 @@ export default function App() {
       // localStorage.clear() // Uncomment to clear local storage and fetch new set of 1000 words
       let corpus = JSON.parse(localStorage.getItem("corpus"))
       if (corpus === null) {
-        const response = await axios.get('https://api.datamuse.com/words?sp=?????&max=1000')
+        const response = await axios.get('https://api.datamuse.com/words?sp=?????&max=1000') // '?????' = 5 character length, 'max' = maximum number of words to pull
         localStorage.setItem('words', JSON.stringify(response.data))
         corpus = JSON.parse(localStorage.getItem("words"))
       }
@@ -49,6 +51,14 @@ export default function App() {
       }
       setLetterFrequency(letterFrequency_) 
     }
+
+  function generateAlphabetColor() {  
+    const colorMap = {}
+    for (let letter of ALPHABET.split("")) {
+      colorMap[letter] = 'bg-white'
+    }
+    return colorMap
+  }
 
   // Getting the correct word
   useEffect(() => {
@@ -66,7 +76,7 @@ export default function App() {
     // Ideally this should be done by the same source. 
     if (currentWord === correctWord) {
       setGameOver('WON')
-      alert("YOU WON! :) RESET the game for a new word")
+      alert("YOU WON! 🎊 Reset the game for a new word")
       return
     }
 
@@ -76,7 +86,7 @@ export default function App() {
     }
     // ====== WARNING END ======
 
-    if (currentWord !== correctWord && wordCount === TOTAL_GUESSES - 1) {
+    if (currentWord !== correctWord && attempts === MAX_ATTEMPTS - 1) {
       setGameOver('LOST')
       alert(`YOU LOST! :( The correct word was "${correctWord.toUpperCase()}" \n Reset the game for a new word`)
       return
@@ -84,11 +94,11 @@ export default function App() {
 
     setGuessedWords((current) => {
       const updatedGuessedWords = [...current]
-      updatedGuessedWords[wordCount] = currentWord
+      updatedGuessedWords[attempts] = currentWord
       return updatedGuessedWords
     })
 
-    setWordCount(wordCount => wordCount + 1)
+    setAttempts(attempts => attempts + 1)
     setLetterCount(0)
     setCurrentWord("     ")
   }
@@ -155,26 +165,42 @@ export default function App() {
 
   function resetGame() {
     console.log(`==== RESETTING THE GAME ====`)
-    setGuessedWords(new Array(TOTAL_GUESSES).fill("     "))
+    setGuessedWords(new Array(MAX_ATTEMPTS).fill("     "))
     fetchNewWord()
-    setWordCount(0)
+    setAttempts(0)
     setLetterCount(0)
     setCurrentWord("     ")
     setGameOver(null)
     console.log(`==== GAME RESET DONE ====`)
   }
 
+  function updateColorMap (letter, newColor) {
+    letter = letter.toLowerCase()
+    const oldColor = alphabetColor[letter]
+
+    // Update sequence: white -> gray -> yellow -> green.
+    // Color cannot be updated in reverse sequence. ex: yellow can be updated to green but not to gray
+    if (oldColor === GREEN) return
+    if (oldColor === YELLOW && newColor !== GREEN) return
+
+    setAlphabetColors((colorMap) => {
+      colorMap[letter] = newColor
+      return colorMap
+    })
+  }
+
   return (
     <div className='flex flex-col items-center'>
       <span className='text-5xl text-white font-extrabold mb-2'>WORDLE<br/>INFINITY!</span>
       {guessedWords.map((word, index) => {
-        if (index === wordCount) {
+        if (index === attempts) {
           return (
             <WordLine 
               word={currentWord} 
               correctWord={correctWord} 
               letterFrequency={letterFrequency} 
               revealed={false || gameOver}
+              updateColorMap={() => {}}
               key={index}
             />
           )
@@ -185,11 +211,12 @@ export default function App() {
             correctWord={correctWord} 
             letterFrequency={letterFrequency} 
             revealed={true}
+            updateColorMap={updateColorMap}
             key={index}
           />
         )
       })}
-      {gameOver == null && <Keyboard/>}
+      {gameOver == null && <Keyboard colorMap={alphabetColor}/>}
       {gameOver && <button className='mt-2' onClick={(e) => {resetGame(); e.target.blur()}}>RESET GAME</button>}
     </div>
   )
