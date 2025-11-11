@@ -28,8 +28,8 @@ function KeyRow({row, colorMap}) {
   }
   
   // Base size that scales down on smaller screens
-  let size = 'w-[32px] h-[40px] sm:w-[40px] sm:h-[45px] md:w-[50px] md:h-[50px]'
-  let style = 'border sm:mx-1 hover:bg-gray-400 rounded-lg flex items-center justify-center text-xs sm:text-sm md:text-base'
+  let size = 'mx-[1px] w-[10%] h-[45px] sm:w-[40px] sm:h-[45px] md:w-[50px] md:h-[50px]'
+  let style = 'flex border hover:bg-gray-400 rounded-lg items-center justify-center text-xs sm:mx-1 sm:text-sm md:text-base'
 
   let bgColor = 'black'
 
@@ -38,7 +38,7 @@ function KeyRow({row, colorMap}) {
 
       if (colorMap) bgColor = colorMap[letter]
       let zSize = letter === 'Enter' || letter === '⌫' 
-        ? 'w-[45px] sm:w-[60px] md:w-[70px] h-[40px] sm:h-[45px] md:h-[50px]'
+        ? 'mx-[1px] w-[45px] h-[45px] px-1 sm:w-[60px] md:w-[70px] h-[40px] sm:h-[45px] md:h-[50px]'
         : size
       return <button key={letter} className={`${zSize} ${bgColor}  ${style}`} onClick={() => handleClick(letter)}>
         {letter.toUpperCase()}

@@ -24,7 +24,7 @@ export default function App() {
 
 
   async function fetchNewWord() {
-      localStorage.clear() // Uncomment to clear local storage and fetch new set of 1000 words
+      // localStorage.clear() // Uncomment to clear local storage and fetch new set of 1000 words
       let corpus = JSON.parse(localStorage.getItem("corpus"))
       if (corpus === null) {
         const response = await axios.get('https://api.datamuse.com/words?sp=?????&max=1000') // '?????' = 5 character length, 'max' = maximum number of words to pull
@@ -33,7 +33,7 @@ export default function App() {
       }
       const randomIndex = Math.floor(Math.random() * corpus.length)
       const word = corpus[randomIndex].word
-      // const word = 'stale' // For testing
+      // const word = 'piano' // For testing
       setCorrectWord(word)
       const letterFrequency_ = {}
       for (let letter of word) {
@@ -180,7 +180,7 @@ export default function App() {
   }
 
   return (
-    <div className='flex flex-col items-center'>
+    <div className='flex flex-col items-center w-full'>
       <span className='text-5xl text-white font-extrabold mb-2'>WORDLE<br/>INFINITY!</span>
       {guessedWords.map((word, index) => {
         if (index === attempts) {
@@ -206,7 +206,7 @@ export default function App() {
           />
         )
       })}
-      {gameOver == null && alphabetColor && <Keyboard colorMap={alphabetColor}/>}
+      {gameOver == null && alphabetColor && <Keyboard className='flex w-full' colorMap={alphabetColor}/>}
       {gameOver && <button className='mt-2 border p-2 rounded-2xl' onClick={(e) => {resetGame(); e.target.blur()}}>RESET GAME</button>}
     </div>
   )
