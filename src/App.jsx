@@ -3,7 +3,7 @@ import './App.css'
 import { useEffect } from 'react'
 import axios from 'axios'
 import { useWordChecker } from 'react-word-checker'
-import WordLine, { GREEN, YELLOW } from './components/WordLine'
+import WordLine, { GRAY, GREEN, YELLOW } from './components/WordLine'
 import Keyboard from './components/Keyboard'
 
 // NOTE: Make sure to refresh the corpus if the numbers are changed (original values are 5 and 6 respectively)
@@ -22,20 +22,9 @@ export default function App() {
   const [gameOver, setGameOver] = useState(null)
   const { _, isLoading, wordExists } = useWordChecker("en")
 
-  function printGameState() { // For debugging purpose only
-    console.log(`==== GAME STATE START ====`)
-    console.log(`guessedWords: ${guessedWords}`)
-    console.log(`correctWord: ${correctWord}`)
-    console.log(`letterFrequency: ${JSON.stringify(letterFrequency)}`)
-    console.log(`attempts: ${attempts}`)
-    console.log(`letterCount: ${letterCount}`)
-    console.log(`currentWord: ${currentWord}`)
-    console.log(`gameOver: ${gameOver}`)
-    console.log(`==== X ====`)
-  }
 
   async function fetchNewWord() {
-      // localStorage.clear() // Uncomment to clear local storage and fetch new set of 1000 words
+      localStorage.clear() // Uncomment to clear local storage and fetch new set of 1000 words
       let corpus = JSON.parse(localStorage.getItem("corpus"))
       if (corpus === null) {
         const response = await axios.get('https://api.datamuse.com/words?sp=?????&max=1000') // '?????' = 5 character length, 'max' = maximum number of words to pull
@@ -44,6 +33,7 @@ export default function App() {
       }
       const randomIndex = Math.floor(Math.random() * corpus.length)
       const word = corpus[randomIndex].word
+      // const word = 'stale' // For testing
       setCorrectWord(word)
       const letterFrequency_ = {}
       for (let letter of word) {
@@ -55,7 +45,7 @@ export default function App() {
   function generateAlphabetColor() {  
     const colorMap = {}
     for (let letter of ALPHABET.split("")) {
-      colorMap[letter] = 'bg-white'
+      colorMap[letter] = GRAY
     }
     return colorMap
   }
@@ -63,7 +53,6 @@ export default function App() {
   // Getting the correct word
   useEffect(() => {
     fetchNewWord()
-    // printGameState() // Enable for debugging or use React dev tools to check state of the game
   }, [])
 
   function handleEnter() {
@@ -171,6 +160,8 @@ export default function App() {
     setLetterCount(0)
     setCurrentWord("     ")
     setGameOver(null)
+    const newColorMap = generateAlphabetColor()
+    setAlphabetColors(newColorMap)
     console.log(`==== GAME RESET DONE ====`)
   }
 
@@ -179,14 +170,13 @@ export default function App() {
     const oldColor = alphabetColor[letter]
 
     // Update sequence: white -> gray -> yellow -> green.
-    // Color cannot be updated in reverse sequence. ex: yellow can be updated to green but not to gray
+    // Color cannot be updated in reverse order. ex: yellow can upgrade to green but cannot downgrade to gray
     if (oldColor === GREEN) return
     if (oldColor === YELLOW && newColor !== GREEN) return
 
-    setAlphabetColors((colorMap) => {
-      colorMap[letter] = newColor
-      return colorMap
-    })
+    let newColorMap = alphabetColor
+    newColorMap[letter] = newColor
+    setAlphabetColors({...newColorMap})
   }
 
   return (
@@ -216,8 +206,8 @@ export default function App() {
           />
         )
       })}
-      {gameOver == null && <Keyboard colorMap={alphabetColor}/>}
-      {gameOver && <button className='mt-2' onClick={(e) => {resetGame(); e.target.blur()}}>RESET GAME</button>}
+      {gameOver == null && alphabetColor && <Keyboard colorMap={alphabetColor}/>}
+      {gameOver && <button className='mt-2 border p-2 rounded-2xl' onClick={(e) => {resetGame(); e.target.blur()}}>RESET GAME</button>}
     </div>
   )
 }

@@ -3,8 +3,9 @@ import { useEffect } from "react"
 
 export const WHITE = 'bg-white'
 export const GRAY = 'bg-gray-400'
-export const YELLOW = 'bg-yellow-500'
-export const GREEN = 'bg-green-400'
+export const YELLOW = 'bg-yellow-600'
+export const GREEN = 'bg-green-600'
+export const DARK_GRAY = 'bg-gray-500'
 
 export default function WordLine( {word, correctWord, letterFrequency, revealed, updateColorMap} ) {
 
@@ -15,8 +16,8 @@ export default function WordLine( {word, correctWord, letterFrequency, revealed,
         const isInCorrectWord = letter in letterFrequency
         const isInCorrectPosition = letter === correctWord[index]
 
-        let bg_color = WHITE
-        if (revealed) bg_color = GRAY
+        let bg_color = GRAY
+        if (revealed) bg_color = DARK_GRAY
         if (isInCorrectWord && revealed) bg_color = YELLOW
         if (isInCorrectPosition && revealed) bg_color = GREEN
 
@@ -42,7 +43,7 @@ function LetterBox({letter, bg_color, updateColorMap}) {
 
   letter = letter.toUpperCase()
   return (
-    <div className={`w-12 h-12 border-2 border-black text-black text-3xl font-medium ${bg_color}`}>
+    <div className={`w-12 h-12 border-2 border-black text-white text-3xl font-medium ${bg_color}`}>
       {letter}
     </div>
   )

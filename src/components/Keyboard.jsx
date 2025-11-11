@@ -4,18 +4,18 @@ const Q = 'q,w,e,r,t,y,u,i,o,p'
 const A = 'a,s,d,f,g,h,j,k,l'
 const Z = 'Enter,z,x,c,v,b,n,m,⌫'
 
-export default function Keyboard() {
+export default function Keyboard({colorMap}) {
 
   return (
     <div className='flex flex-col items-center gap-0.5 sm:gap-2 my-2 w-full overflow-hidden px-0.5'>
-      <KeyRow row={Q}/>
-      <KeyRow row={A}/>
-      <KeyRow row={Z}/>
+      <KeyRow row={Q} colorMap={colorMap}/>
+      <KeyRow row={A} colorMap={colorMap}/>
+      <KeyRow row={Z} colorMap={colorMap}/>
     </div>
   )
 }
 
-function KeyRow({row}) {
+function KeyRow({row, colorMap}) {
 
   function handleClick(letter) {
     const event = new KeyboardEvent('keydown', {
@@ -31,13 +31,17 @@ function KeyRow({row}) {
   let size = 'w-[32px] h-[40px] sm:w-[40px] sm:h-[45px] md:w-[50px] md:h-[50px]'
   let style = 'border sm:mx-1 hover:bg-gray-400 rounded-lg flex items-center justify-center text-xs sm:text-sm md:text-base'
 
+  let bgColor = 'black'
+
   return <div className='flex justify-center w-full'>
-    {row.split(",").map((charKey, _) => {
-      let zSize = charKey === 'Enter' || charKey === '⌫' 
+    {row.split(",").map((letter, _) => {
+
+      if (colorMap) bgColor = colorMap[letter]
+      let zSize = letter === 'Enter' || letter === '⌫' 
         ? 'w-[45px] sm:w-[60px] md:w-[70px] h-[40px] sm:h-[45px] md:h-[50px]'
         : size
-      return <button key={charKey} className={`${zSize} ${style}`} onClick={() => handleClick(charKey)}>
-        {charKey}
+      return <button key={letter} className={`${zSize} ${bgColor}  ${style}`} onClick={() => handleClick(letter)}>
+        {letter.toUpperCase()}
       </button>
     })}
   </div>
